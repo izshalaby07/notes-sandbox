@@ -50,7 +50,7 @@ A note has: `id` (Guid), `title`, `body`, `createdAt`, `updatedAt` (UTC).
   - `title`: required; `string.IsNullOrWhiteSpace` counts as missing; max 200.
   - `body`: optional; max 10,000.
   - Length is `string.Length` (UTF-16 code units). Arabic diacritics count as separate characters.
-  - `page` ≥ 1; `pageSize` from 1 to 100. Values outside these ranges are rejected, not adjusted.
+  - `page` ≥ 1; `pageSize` from 1 to 100. Values outside these ranges are rejected, not adjusted. A non-numeric `page` or `pageSize` (e.g. `page=abc`) fails during binding and returns 400 `ProblemDetails` that does not need to name the field.
 - **Text is never changed**: no trimming, no Unicode normalization, no case changes on what is stored or returned.
 - **Request bodies**: `POST` and `PUT` take `title` and `body`. Any `id`, `createdAt` or `updatedAt` in the request is ignored. A missing or `null` `body` is stored as an empty string. Responses always return `body` as a string.
 - **Responses**:
@@ -87,6 +87,7 @@ A note has: `id` (Guid), `title`, `body`, `createdAt`, `updatedAt` (UTC).
 - [ ] List returns `{ items, page, pageSize, totalCount }`, newest `createdAt` first, with ties broken by `id`, and respects the page size; asking past the last page returns 200 with empty `items`.
 - [ ] `GET /notes` with no paging parameters uses page 1 and page size 20.
 - [ ] `page=0`, `pageSize=0` and `pageSize=101` each return 400 naming the field; `pageSize=100` succeeds.
+- [ ] A non-numeric `page` or `pageSize` returns 400 `ProblemDetails` (field name not required).
 - [ ] Search matches regardless of case for English and finds Arabic text inside a longer body; results are paged and ordered like the list; an empty `search` returns the unfiltered list.
 
 ## Out of scope (later specs)
