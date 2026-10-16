@@ -120,6 +120,21 @@ public class ListNotesTests
     }
 
     [Fact]
+    public async Task List_HugePageNumber_ReturnsEmptyItemsAndRealTotal()
+    {
+        var (factory, client, _) = NewApp();
+        using var _f = factory;
+        await Create(client, "only");
+
+        var response = await client.GetAsync($"/notes?page={int.MaxValue}&pageSize=100");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var json = await ReadJson(response);
+        Assert.Equal(0, json.GetProperty("items").GetArrayLength());
+        Assert.Equal(1, json.GetProperty("totalCount").GetInt32());
+    }
+
+    [Fact]
     public async Task List_PageSize100_Returns200()
     {
         var (factory, client, _) = NewApp();

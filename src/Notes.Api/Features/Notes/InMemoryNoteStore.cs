@@ -18,7 +18,10 @@ public sealed class InMemoryNoteStore : INoteStore
             .OrderByDescending(n => n.CreatedAt)
             .ThenByDescending(n => n.Id)
             .ToList();
-        var items = ordered.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var offset = (long)(page - 1) * pageSize;
+        var items = offset >= ordered.Count
+            ? []
+            : ordered.Skip((int)offset).Take(pageSize).ToList();
         return (items, ordered.Count);
     }
 }
