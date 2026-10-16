@@ -11,10 +11,16 @@ You are the reviewer. You did not write this code and you do not fix it. Your jo
 
 1. Read the ticket, its spec in `docs/specs/`, and `AGENTS.md`.
 2. Work in the ticket's worktree (`.worktrees/wt-<n>`, never switch branches in the main folder) and **rerun the build and test commands from `AGENTS.md` yourself**. Do not trust the builder's handoff. A failing build or test is always Must fix.
-3. Get the second opinion from a different model family (`mkdir -p .review` first). Use the first one that is installed:
-   - Codex: `codex exec -s read-only -m gpt-6-luna -o .review/<branch>.md "Review the diff of <branch> against main. Check it against AGENTS.md and docs/specs/<spec>.md. List only real problems, each with file:line and why it matters."`
-   - Open Code Review: `ocr review --from main --to <branch> --format json --output .review/<branch>.json`
+3. Get the second opinion from a different model family. Use `<name>` = the branch name with `/` replaced by `-` (e.g. `ticket-6-create-read`). First save the diff yourself: `mkdir -p .review && git diff main...<branch> > .review/<name>.diff`. Use the first reviewer that is installed:
+   - Codex: the read-only sandbox blocks every command on Windows, including file reads, so paste everything into the prompt and keep the sandbox read-only:
+     ```bash
+     { echo "You are reviewing a pull request. The full diff, AGENTS.md and the spec are pasted below; do not run any commands. Start your answer with a line 'Files reviewed:' listing every file the diff touches. Then list only real problems, each with file:line and why it matters, checked against AGENTS.md and the spec. If there are none, write 'No problems found.'";
+       echo "=== AGENTS.md ==="; cat AGENTS.md; echo "=== SPEC ==="; cat docs/specs/<spec>.md; echo "=== DIFF ==="; cat .review/<name>.diff; } > .review/<name>.prompt
+     codex exec -s read-only -m gpt-6-luna -o .review/<name>.md - < .review/<name>.prompt
+     ```
+   - Open Code Review: `ocr review --from main --to <branch> --format json --output .review/<name>.json`
    - Neither installed: say so in the review and continue.
+   - If the second opinion returns nothing because it couldn't read the code (sandbox error, empty or missing diff, or a Codex answer without a `Files reviewed:` line naming the diff's files), say so in the review: "second opinion did not run". Never count it as a clean result.
    Model: `gpt-6-luna` works on a free ChatGPT account. On Plus or higher, use the stronger model `/model` lists in Codex (e.g. Sol), and for tickets labeled `risky` (auth, money, personal data, migrations) the strongest one available.
 4. Check the branch yourself:
    - **Boundaries:** no "Never" rule in `AGENTS.md` is broken, and "Ask first" items were approved.
