@@ -9,6 +9,7 @@ public static class NotesEndpoints
         var notes = app.MapGroup("/notes");
         notes.MapPost("/", Create);
         notes.MapGet("/{id:guid}", GetById).WithName("GetNoteById");
+        notes.MapDelete("/{id:guid}", Delete);
         return app;
     }
 
@@ -31,6 +32,13 @@ public static class NotesEndpoints
     {
         return store.TryGet(id, out var note)
             ? TypedResults.Ok(NoteResponse.From(note!))
+            : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, title: "Note not found.");
+    }
+
+    private static Results<NoContent, ProblemHttpResult> Delete(Guid id, INoteStore store)
+    {
+        return store.Remove(id)
+            ? TypedResults.NoContent()
             : TypedResults.Problem(statusCode: StatusCodes.Status404NotFound, title: "Note not found.");
     }
 }
