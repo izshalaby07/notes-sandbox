@@ -38,3 +38,13 @@ Optional agents live in `.claude/agents-optional/`; copy one into `.claude/agent
 **Use subagents only when they pay off:** isolated context for heavy reading, a fresh pair of eyes for review, or restricted tools. Do small fixes inline.
 
 **If the free model is rate-limited** (429 / "rate limit" errors), don't wait: rerun the ticket with the Sonnet builder and note it in the log.
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues for `izshalaby07/notes-sandbox`, used through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: one glossary at `docs/GLOSSARY.md` and ADRs in `docs/adr/`. See `docs/agents/domain.md`.
