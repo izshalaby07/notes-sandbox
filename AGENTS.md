@@ -7,11 +7,11 @@ A tiny notes API used to test the AI agent team. Throwaway code, no real data, A
 Run the narrowest command that checks your change. Full build, test and format check before you push.
 
 ```
-dotnet build                                            # build everything
-dotnet test                                             # all tests
+dotnet build --nologo -v q                              # build everything
+dotnet test --nologo -v q                               # all tests
 dotnet test --filter FullyQualifiedName~NotesEndpoints  # one test class
 dotnet format                                           # fix formatting
-dotnet format --verify-no-changes                       # what CI checks
+dotnet format --verify-no-changes -v q                  # what CI checks
 dotnet run --project src/Notes.Api                      # run locally
 ```
 
