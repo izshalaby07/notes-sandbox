@@ -1,0 +1,58 @@
+# Gate 1: every PR must pass this before it can merge.
+# Make it required: Settings → Branches (or Rules) → protect main → require status check "build-and-test".
+# Steps only run for the parts this repo has, so the template works for .NET, web or both.
+name: ci
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------- .NET ----------
+      - name: Set up .NET
+        if: hashFiles('**/*.csproj') != ''
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Build (.NET)
+        if: hashFiles('**/*.csproj') != ''
+        run: dotnet build --configuration Release
+
+      - name: Test (.NET)
+        if: hashFiles('**/*.csproj') != ''
+        run: dotnet test --configuration Release --no-build
+
+      - name: Format check (.NET)
+        if: hashFiles('**/*.csproj') != ''
+        run: dotnet format --verify-no-changes
+
+      # ---------- Web (src/web) ----------
+      - name: Set up Node
+        if: hashFiles('src/web/package.json') != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build and test (web)
+        if: hashFiles('src/web/package.json') != ''
+        working-directory: src/web
+        run: |
+          npm ci
+          npm run build
+          npm test --if-present -- --watch=false
+
+      - name: Nothing to build yet
+        if: hashFiles('**/*.csproj') == '' && hashFiles('src/web/package.json') == ''
+        run: echo "No .NET or web project found yet. Passing."

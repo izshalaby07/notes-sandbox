@@ -1,0 +1,26 @@
+# .NET
+bin/
+obj/
+*.user
+appsettings.Development.json
+appsettings.Local.json
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# Secrets and env
+.env
+.env.*
+*.pfx
+*.pem
+
+# Agent tooling local state
+.claude/settings.local.json
+.ocr-output/
+.review/
+*.log
+
+# Agent worktrees (inside the repo so every agent may edit them)
+.worktrees/

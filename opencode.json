@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*appsettings.Local.json": "deny"
+    },
+    "bash": {
+      "*": "allow",
+      "git push * main": "deny",
+      "git push * master": "deny",
+      "git push --force *": "deny",
+      "git push -f *": "deny",
+      "gh pr merge *": "deny",
+      "az deployment *": "deny",
+      "terraform apply *": "deny",
+      "kubectl apply *": "deny",
+      "rm -rf *": "deny"
+    },
+    "webfetch": "ask"
+  }
+}
