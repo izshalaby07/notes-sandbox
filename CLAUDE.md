@@ -30,7 +30,7 @@ Optional agents live in `.claude/agents-optional/`; copy one into `.claude/agent
      ```
    - `normal`: use the builder subagent, telling it to work in `.worktrees/wt-<n>`.
    - Tickets with no dependency on each other can run at the same time, one worktree each.
-5. When the PR exists and CI is green, use the reviewer subagent on it.
+5. When the PR exists and CI is green, use the reviewer subagent on it. It writes `.review/<name>-verdict.md` (`<name>` = the branch with `/` replaced by `-`) and never posts. Post that file exactly as written: `gh pr comment <pr> --body-file .review/<name>-verdict.md`. Never edit, summarize or change the verdict. If you have your own view, post it as a separate comment headed "Main session note".
 6. "Changes needed": send the review back to the same builder. If it fails again, move the ticket up one tier (free model → Sonnet → Opus). After the third failed round, stop and tell the owner.
 7. "Pass": tell the owner the PR is ready. The owner merges. Then `git worktree remove .worktrees/wt-<n>`.
 8. After any PR merges, every other open ticket branch rebases on `main` and re-runs build and tests before (re-)review. Parallel tickets touch the same files. The builder resolves rebase conflicts; if it can't, stop and tell the owner.
