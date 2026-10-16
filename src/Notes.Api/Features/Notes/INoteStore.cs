@@ -7,4 +7,6 @@ public interface INoteStore
     bool TryGet(Guid id, out Note? note);
 
     bool Remove(Guid id);
+
+    (IReadOnlyList<Note> Items, int TotalCount) List(int page, int pageSize);
 }
