@@ -1,0 +1,2 @@
+ticket,session,agent,model,started_utc,minutes,steps,tool_calls,input,cache_read,cache_write,output,reasoning,total,cost_usd,repeated_calls,tools
+5,ses_eb9bd7d8effeUxn82RebizVrwH,builder,openrouter/poolside/laguna-s-2.1:free,2026-10-16T19:48:46.487Z,9.8,36,52,202930,1041440,0,6264,11752,1262386,0.0000,0,"bash:23 read:17 todowrite:6 edit:4 write:2"
