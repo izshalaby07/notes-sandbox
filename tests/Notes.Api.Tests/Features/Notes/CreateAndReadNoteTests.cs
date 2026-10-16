@@ -67,8 +67,12 @@ public class CreateAndReadNoteTests : IClassFixture<WebApplicationFactory<Progra
     [Fact]
     public async Task Post_ClientSentServerFields_AreIgnored()
     {
+        var time = new StubTimeProvider(FixedNow);
+        using var factory = _factory.WithWebHostBuilder(b =>
+            b.ConfigureServices(s => s.AddSingleton<TimeProvider>(time)));
+        var client = factory.CreateClient();
         var clientId = Guid.NewGuid();
-        var response = await _client.PostAsJsonAsync("/notes", new
+        var response = await client.PostAsJsonAsync("/notes", new
         {
             id = clientId,
             title = "t",
@@ -80,8 +84,8 @@ public class CreateAndReadNoteTests : IClassFixture<WebApplicationFactory<Progra
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         var note = await ReadJson(response);
         Assert.NotEqual(clientId, note.GetProperty("id").GetGuid());
-        Assert.NotEqual(2001, note.GetProperty("createdAt").GetDateTimeOffset().Year);
-        Assert.NotEqual(2002, note.GetProperty("updatedAt").GetDateTimeOffset().Year);
+        Assert.Equal(FixedNow, note.GetProperty("createdAt").GetDateTimeOffset());
+        Assert.Equal(FixedNow, note.GetProperty("updatedAt").GetDateTimeOffset());
     }
 
     [Fact]
