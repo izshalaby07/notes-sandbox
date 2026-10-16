@@ -33,7 +33,8 @@ Optional agents live in `.claude/agents-optional/`; copy one into `.claude/agent
 5. When the PR exists and CI is green, use the reviewer subagent on it.
 6. "Changes needed": send the review back to the same builder. If it fails again, move the ticket up one tier (free model → Sonnet → Opus). After the third failed round, stop and tell the owner.
 7. "Pass": tell the owner the PR is ready. The owner merges. Then `git worktree remove .worktrees/wt-<n>`.
-8. Add a row to `docs/pilot-log.md` for every ticket.
+8. After any PR merges, every other open ticket branch rebases on `main` and re-runs build and tests before (re-)review. Parallel tickets touch the same files. The builder resolves rebase conflicts; if it can't, stop and tell the owner.
+9. Add a row to `docs/pilot-log.md` for every ticket.
 
 **Use subagents only when they pay off:** isolated context for heavy reading, a fresh pair of eyes for review, or restricted tools. Do small fixes inline.
 
