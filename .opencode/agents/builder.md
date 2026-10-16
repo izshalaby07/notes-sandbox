@@ -1,6 +1,6 @@
 ---
 description: Builds one approved ticket, test first, on its own branch. Cheap/free-model builder for tickets labeled "simple". Same job as .claude/agents/builder.md.
-mode: subagent
+mode: all
 model: openrouter/poolside/laguna-s-2.1:free
 permission:
   edit: allow
