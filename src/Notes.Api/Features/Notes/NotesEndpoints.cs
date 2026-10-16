@@ -8,6 +8,7 @@ public static class NotesEndpoints
     {
         var notes = app.MapGroup("/notes");
         notes.MapPost("/", Create);
+        notes.MapGet("/", List);
         notes.MapGet("/{id:guid}", GetById).WithName("GetNoteById");
         notes.MapDelete("/{id:guid}", Delete);
         return app;
@@ -26,6 +27,22 @@ public static class NotesEndpoints
         var note = new Note(Guid.NewGuid(), request.Title!, request.Body ?? "", now, now);
         store.Add(note);
         return TypedResults.Created($"/notes/{note.Id}", NoteResponse.From(note));
+    }
+
+    private static Results<Ok<NoteListResponse>, ValidationProblem> List(
+        INoteStore store, int? page, int? pageSize)
+    {
+        var pageValue = page ?? 1;
+        var pageSizeValue = pageSize ?? PagingValidator.DefaultPageSize;
+        var errors = PagingValidator.Validate(pageValue, pageSizeValue);
+        if (errors.Count > 0)
+        {
+            return TypedResults.ValidationProblem(errors);
+        }
+
+        var (items, totalCount) = store.List(pageValue, pageSizeValue);
+        return TypedResults.Ok(new NoteListResponse(
+            items.Select(NoteResponse.From).ToList(), pageValue, pageSizeValue, totalCount));
     }
 
     private static Results<Ok<NoteResponse>, ProblemHttpResult> GetById(Guid id, INoteStore store)
