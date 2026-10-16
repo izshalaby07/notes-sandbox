@@ -26,8 +26,11 @@ Optional agents live in `.claude/agents-optional/`; copy one into `.claude/agent
    - `simple`: run the free builder from that folder:
      ```bash
      (cd .worktrees/wt-<n> && GIT_EDITOR=false GIT_PAGER=cat GIT_TERMINAL_PROMPT=0 \
-       opencode run --agent builder --auto "Build GitHub issue #<n>. Read it with gh issue view <n>. Follow AGENTS.md.")
+       opencode run --agent builder --auto --title "ticket-<n>" \
+         "Build GitHub issue #<n>. Read it with gh issue view <n>. Follow AGENTS.md." > ../wt-<n>.log 2>&1)
      ```
+     The output goes to `.worktrees/wt-<n>.log`, and the session is titled `ticket-<n>` so `opencode session list` finds it for the export.
+     Free tier without credit ≈ 50 requests/day ≈ 1 ticket — don't run free-model tickets in parallel.
    - `normal`: use the builder subagent, telling it to work in `.worktrees/wt-<n>`.
    - Tickets with no dependency on each other can run at the same time, one worktree each.
 5. When the PR exists and CI is green, use the reviewer subagent on it. It writes `.review/<name>-verdict.md` (`<name>` = the branch with `/` replaced by `-`) and never posts. Post that file exactly as written: `gh pr comment <pr> --body-file .review/<name>-verdict.md`. Never edit, summarize or change the verdict. If you have your own view, post it as a separate comment headed "Main session note".
