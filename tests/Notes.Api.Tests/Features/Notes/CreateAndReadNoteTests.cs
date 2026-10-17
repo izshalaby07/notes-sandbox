@@ -126,7 +126,7 @@ public class CreateAndReadNoteTests : IClassFixture<WebApplicationFactory<Progra
     public async Task Post_ArabicTitleWithSpaces_ReadsBackIdentical()
     {
         var title = "  " + ArabicTitle + "  ";
-        var body = "نص الملاحظة ";
+        var body = "  نص الملاحظة ";
         var created = await _client.PostAsJsonAsync("/notes", new { title, body });
 
         var response = await _client.GetAsync(created.Headers.Location);
@@ -148,6 +148,46 @@ public class CreateAndReadNoteTests : IClassFixture<WebApplicationFactory<Progra
         await AssertProblemDetails(response, HttpStatusCode.BadRequest);
         var problem = await ReadJson(response);
         Assert.True(problem.GetProperty("errors").TryGetProperty("title", out _));
+    }
+
+    [Fact]
+    public async Task Post_TitleOf200Chars_Returns201()
+    {
+        var title = new string('a', 200);
+        var response = await _client.PostAsJsonAsync("/notes", new { title });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_TitleOf201Chars_Returns400NamingTitle()
+    {
+        var title = new string('a', 201);
+        var response = await _client.PostAsJsonAsync("/notes", new { title });
+
+        await AssertProblemDetails(response, HttpStatusCode.BadRequest);
+        var problem = await ReadJson(response);
+        Assert.True(problem.GetProperty("errors").TryGetProperty("title", out _));
+    }
+
+    [Fact]
+    public async Task Post_BodyOf10000Chars_Returns201()
+    {
+        var body = new string('ا', 10000);
+        var response = await _client.PostAsJsonAsync("/notes", new { title = "t", body });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_BodyOf10001Chars_Returns400NamingBody()
+    {
+        var body = new string('ا', 10001);
+        var response = await _client.PostAsJsonAsync("/notes", new { title = "t", body });
+
+        await AssertProblemDetails(response, HttpStatusCode.BadRequest);
+        var problem = await ReadJson(response);
+        Assert.True(problem.GetProperty("errors").TryGetProperty("body", out _));
     }
 
     [Fact]
