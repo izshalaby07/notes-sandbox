@@ -126,7 +126,7 @@ public class CreateAndReadNoteTests : IClassFixture<WebApplicationFactory<Progra
     public async Task Post_ArabicTitleWithSpaces_ReadsBackIdentical()
     {
         var title = "  " + ArabicTitle + "  ";
-        var body = "نص الملاحظة ";
+        var body = "  نص الملاحظة ";
         var created = await _client.PostAsJsonAsync("/notes", new { title, body });
 
         var response = await _client.GetAsync(created.Headers.Location);
