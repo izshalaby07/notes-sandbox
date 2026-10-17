@@ -12,6 +12,22 @@ public sealed class InMemoryNoteStore : INoteStore
 
     public bool Remove(Guid id) => _notes.TryRemove(id, out _);
 
+    public bool TryUpdate(Guid id, Func<Note, Note> update, out Note? updated)
+    {
+        while (_notes.TryGetValue(id, out var existing))
+        {
+            var candidate = update(existing);
+            if (_notes.TryUpdate(id, candidate, existing))
+            {
+                updated = candidate;
+                return true;
+            }
+        }
+
+        updated = null;
+        return false;
+    }
+
     public (IReadOnlyList<Note> Items, int TotalCount) List(int page, int pageSize)
     {
         var ordered = _notes.Values
