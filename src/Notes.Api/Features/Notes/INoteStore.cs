@@ -8,5 +8,7 @@ public interface INoteStore
 
     bool Remove(Guid id);
 
+    bool TryUpdate(Guid id, Func<Note, Note> update, out Note? updated);
+
     (IReadOnlyList<Note> Items, int TotalCount) List(int page, int pageSize);
 }
